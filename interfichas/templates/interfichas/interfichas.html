@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-container py-4">
+    <div class="container">
+        <h2 class="text-white text-center mb-4">Gestión de Torneos Inter-Fichas</h2>
+
+        <!-- Botón para abrir modal de creación -->
+        <div class="text-end mb-3">
+            <button class="btn btn-dark border-white text-white" data-bs-toggle="modal" data-bs-target="#modalCrearTorneo">
+                <i class="fas fa-plus me-2"></i>Nuevo Torneo
+            </button>
+        </div>
+
+        <!-- Tabla con datos de la DB -->
+        <div class="sport-card">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Disciplina</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in torneos %}
+                    <tr>
+                        <td>{{ t.nombre_torneo }}</td>
+                        <td>{{ t.disciplina }}</td>
+                        <td>{{ t.fecha_torneo_fichas }}</td>
+                        <td><span class="badge bg-success">{{ t.estado }}</span></td>
+                        <td>
+                            <a href="{% url 'eliminar_torneo' t.codigo_torneo_fichas %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay torneos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA CREAR TORNEO -->
+<div class="modal fade" id="modalCrearTorneo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content custom-modal">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <h5 class="fw-bold mb-3">Crear Nuevo Torneo</h5>
+                    <input type="text" name="nombre" class="form-control custom-input mb-2" placeholder="Nombre del Torneo" required>
+                    <input type="text" name="disciplina" class="form-control custom-input mb-2" placeholder="Disciplina" required>
+                    <input type="date" name="fecha" class="form-control custom-input mb-2" required>
+                    <input type="time" name="hora" class="form-control custom-input mb-2" required>
+                    <input type="text" name="lugar" class="form-control custom-input mb-2" placeholder="Lugar/Cancha" required>
+                    <button type="submit" class="btn btn-dark w-100">Guardar Torneo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
