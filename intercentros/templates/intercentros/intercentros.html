@@ -15,93 +15,46 @@
         <div class="modulo-header text-center mb-5">
             <i class="fas fa-building fa-3x mb-3"></i>
             <h2 class="fw-bold text-white">Torneos Inter-Centros</h2>
-            <p class="text-white-50">Gestiona los torneos entre centros de formación del SENA</p>
+            <p class="text-white-50">Mantente informado sobre toda la información relacionada con la conformación de equipos <br>que representaran al SENA Centro MInero en los torneos Inter-centros. </p>
         </div>
 
         <!-- Tarjetas de acciones -->
         <div class="row g-4 mb-5">
             <div class="col-md-4">
                 <div class="sport-card">
-                    <i class="fas fa-list-alt fa-2x mb-3 text-warning"></i>
-                    <h5>VER TORNEOS</h5>
-                    <p>Consulta todos los torneos activos y finalizados por disciplina.</p>
-                    <button class="btn btn-dark btn-sm mt-2 btn-accion-centro" data-seccion="torneos">
-                        <i class="fas fa-eye me-1"></i>Ver
+                    <i class="fas fa-user-plus fa-2x mb-3 text-warning"></i>
+                    <h5>INSCRIBIR APRENDIZ</h5>
+                    <p>Registrate para tener la oportunidad de representar al Centro Minero en los torneos inter-centros.</p>
+                    <button class="btn btn-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalCrearTorneo">
+                        <i class="fas fa-plus me-3"></i>INSCRIBIR
                     </button>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="sport-card">
-                    <i class="fas fa-user-plus fa-2x mb-3 text-warning"></i>
-                    <h5>INSCRIBIR EQUIPO</h5>
-                    <p>Registra tu centro en los torneos disponibles.</p>
-                    <button class="btn btn-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalCrearTorneo">
-                        <i class="fas fa-plus me-1"></i>Nuevo Torneo
+                    <i class="fas fa-list-alt fa-2x mb-3 text-warning"></i>
+                    <h5>ENTRENAMIENTOS</h5>
+                    <p>Consulta la hora y el lugar de los entrenamientos segun tu disciplina.</p>
+                    <button class="btn btn-dark btn-sm mt-2 btn-accion-centro" data-seccion="torneos">
+                        <i class="fas fa-eye me-3"></i>CONSULTAR
                     </button>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="sport-card">
                     <i class="fas fa-chart-bar fa-2x mb-3 text-warning"></i>
-                    <h5>RESULTADOS</h5>
-                    <p>Mira lastabla de posiciones y estadísticas.</p>
+                    <h5>NOVEDADES</h5>
+                    <p>Mantente enterado sobre los aprendices que quedaron seleccionados para representr al Centro Mineroen.</p>
                     <button class="btn btn-dark btn-sm mt-2 btn-accion-centro" data-seccion="resultados">
-                        <i class="fas fa-poll me-1"></i>Ver Resultados
+                        <i class="fas fa-poll me-3"></i>VER
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Panel dinámico -->
-        <div id="panel-intercentros" class="panel-interfichas d-none mb-4">
-            <div id="panel-contenido-centro"></div>
-        </div>
-
+        
         <!-- Tabla de Torneos -->
-        <div class="sport-card text-start mt-2">
-            <h5 class="fw-bold mb-3">
-                <i class="fas fa-fire text-warning me-2"></i>Torneos Registrados
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
-                            <th>Disciplina</th>
-                            <th>Fecha</th>
-                            <th>Lugar</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in torneos %}
-                        <tr>
-                            <td>{{ t.codigo_torneo_centro }}</td>
-                            <td>{{ t.nombre_torneo }}</td>
-                            <td>{{ t.disciplina }}</td>
-                            <td>{{ t.fecha_torneo }}</td>
-                            <td>{{ t.lugar }}</td>
-                            <td><span class="badge bg-success">{{ t.estado }}</span></td>
-                            <td>
-                                <a href="{% url 'editar_torneo_centro' t.codigo_torneo_centro %}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="{% url 'eliminar_torneo_centro' t.codigo_torneo_centro %}" class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center">No hay torneos registrados.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
     </div>
 </div>
@@ -112,7 +65,7 @@
         <div class="modal-content custom-modal">
             <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold">
-                    <i class="fas fa-plus me-2"></i>Nuevo Torneo Inter-Centros
+                    <i class="fas fa-plus me-2"></i>Inscribir Aprendiz
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -120,13 +73,29 @@
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre del Torneo</label>
-                        <input type="text" name="nombre" class="form-control custom-input" placeholder="Ej: Copa Intercentros 2026" required>
+                        <label class="form-label fw-bold">Nombres</label>
+                        <input type="text" name="nombre" class="form-control custom-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Apellidos </label>
+                        <input type="text" name="apellido" class="form-control custom-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ficha</label>
+                        <input type="number" name="ficha" class="form-control custom-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Programa de Formación </label>
+                        <select name="programa" class="form-select custom-input"  required>
+                            <option value="">Seleccionar...</option>
+                            <option>Análisis y Desarrollo de Software</option>
+                            <option>Química Aplicada a la Industria</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Disciplina</label>
-                        <select name="disciplina" class="form-select custom-input">
-                            <option value="">Selecciona...</option>
+                        <select name="disciplina" class="form-select custom-input" required>
+                            <option value="">Seleccionar...</option>
                             <option>Fútbol</option>
                             <option>Baloncesto</option>
                             <option>Voleibol</option>
@@ -134,16 +103,8 @@
                             <option>Ajedrez</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Fecha</label>
-                        <input type="date" name="fecha" class="form-control custom-input" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Lugar</label>
-                        <input type="text" name="lugar" class="form-control custom-input" placeholder="Ej: Cancha Principal SENA" required>
-                    </div>
                     <button type="submit" class="btn btn-dark w-100 py-2">
-                        <i class="fas fa-check me-2"></i>Guardar Torneo
+                        <i class="fas fa-check me-2"></i>Registrar Aprendiz
                     </button>
                 </form>
             </div>
