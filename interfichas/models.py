@@ -1,5 +1,12 @@
 from django.db import models
 
+
+class Disciplina(models.Model):
+    nombre_disciplina = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.nombre_disciplina
+    
 class TorneoInterfichas(models.Model):
     codigo_torneo_fichas = models.AutoField(primary_key=True)
     nombre_torneo = models.CharField(max_length=100)
