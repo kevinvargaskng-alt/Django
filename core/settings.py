@@ -11,7 +11,8 @@ SECRET_KEY = 'django-insecure--+k6(v(s%fu$4wf6!f_n(=1*5(^txum^g-@4p8sxybqvna6g4x
 # SEGURIDAD: No uses DEBUG = True en producción
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# CAMBIO AQUÍ: Se agrega tu IP local y '*' para permitir acceso desde el celular
+ALLOWED_HOSTS = ['192.168.1.9', 'localhost', '127.0.0.1', '*']
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -101,7 +102,6 @@ LOGIN_REDIRECT_URL = 'perfil'
 LOGOUT_REDIRECT_URL = 'home'
 
 # ── CONFIGURACIÓN DE CORREO (GMAIL REAL) ─────────────────
-# Se activa el envío real a través de los servidores de Google
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -112,7 +112,7 @@ EMAIL_HOST_USER = 'kevinvargaskng@gmail.com'
 EMAIL_HOST_PASSWORD = 'pows bgxm pmvc zxvz' 
 
 # Nombre que aparecerá en el remitente del correo
-DEFAULT_FROM_EMAIL = 'Gestión Deportiva <tu_correo@gmail.com>'
+DEFAULT_FROM_EMAIL = 'Gestión Deportiva <kevinvargaskng@gmail.com>'
 
 # ── SUGERENCIAS DE UX Y SEGURIDAD ────────────────────────
 

@@ -9,7 +9,7 @@
     body { display: flex; flex-direction: column; background: #0b0e14 !important; color: #f0f6fc !important; }
     .main-wrapper { flex: 1; padding: 40px 20px; }
 
-    /* Hero Banner */
+    /* Hero Banner Responsive */
     .hero-banner {
         width: 100%; max-width: 1100px; margin: 0 auto 40px;
         background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
@@ -17,9 +17,10 @@
         display: flex; align-items: center; justify-content: space-between;
     }
 
-    /* Grid de Acciones */
+    /* Grid de Acciones Responsive */
     .action-grid {
-        display: grid; grid-template-columns: repeat(3, 1fr);
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr);
         gap: 25px; width: 100%; max-width: 1100px; margin: 0 auto 50px;
     }
 
@@ -30,13 +31,12 @@
     .action-card:hover { transform: translateY(-5px); border-color: #f97316; }
     .action-card i { color: #f97316; margin-bottom: 20px; }
     
-    /* Botones Dobles */
     .btn-group-custom { display: flex; gap: 10px; margin-top: 15px; }
     .btn-group-custom .btn { flex: 1; font-size: 0.75rem; font-weight: bold; }
 
     .custom-input { background: #0d1117 !important; border: 1px solid #30363d !important; color: white !important; }
 
-    /* Tabla */
+    /* Tabla y Contenedor */
     .table-container { width: 100%; max-width: 1100px; margin: 0 auto; }
     .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
     .custom-table tr { background: #161b22; }
@@ -45,6 +45,66 @@
     .custom-table td:last-child { border-right: 1px solid #30363d; border-radius: 0 12px 12px 0; }
 
     footer { padding: 25px; background: #090c10; border-top: 1px solid #30363d; margin-top: auto; }
+
+    /* =========================================================
+       ESTILOS RESPONSIVE (MÓVIL)
+       ========================================================= */
+    @media (max-width: 768px) {
+        .main-wrapper { padding: 20px 15px; }
+
+        /* Banner en vertical */
+        .hero-banner {
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .hero-banner .btn { width: 100%; }
+
+        /* Grid de acciones a 1 columna */
+        .action-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        /* Transformación de Tabla a Tarjetas */
+        .custom-table thead { display: none; } /* Escondemos cabecera */
+        
+        .custom-table, .custom-table tbody, .custom-table tr, .custom-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .custom-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #30363d;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .custom-table td {
+            text-align: left;
+            padding: 10px 15px;
+            border: none;
+            position: relative;
+            padding-left: 45%; /* Espacio para el label */
+        }
+
+        /* Etiquetas para saber qué es cada dato en el móvil */
+        .custom-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 15px;
+            font-weight: bold;
+            color: #f97316;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+
+        .custom-table td:first-child, .custom-table td:last-child {
+            border-radius: 0;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -109,13 +169,13 @@
             <tbody>
                 {% for t in torneos %}
                 <tr>
-                    <td class="text-white fw-bold">{{ t.nombre_torneo }}</td>
-                    <td class="text-warning fw-bold">{{ t.disciplina }}</td>
-                    <td class="small">{{ t.lugar }}</td>
-                    <td>{{ t.fecha_torneo|date:"d/m/Y" }}</td>
-                    <td>
-                        <a href="{% url 'eliminar_torneo' t.codigo_torneo_centro %}" class="text-danger opacity-50" onclick="return confirm('¿Eliminar?')">
-                            <i class="fas fa-trash-alt"></i>
+                    <td data-label="Evento" class="text-white fw-bold">{{ t.nombre_torneo }}</td>
+                    <td data-label="Deporte" class="text-warning fw-bold">{{ t.disciplina }}</td>
+                    <td data-label="Lugar" class="small">{{ t.lugar }}</td>
+                    <td data-label="Fecha">{{ t.fecha_torneo|date:"d/m/Y" }}</td>
+                    <td data-label="Acción">
+                        <a href="{% url 'eliminar_torneo' t.codigo_torneo_centro %}" class="text-danger" onclick="return confirm('¿Eliminar?')">
+                            <i class="fas fa-trash-alt"></i> Borrar
                         </a>
                     </td>
                 </tr>
@@ -134,16 +194,12 @@
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="accion" value="crear_torneo">
-                <div class="modal-body">
+                <div class="modal-body text-start">
                     <div class="mb-3"><label class="form-label small fw-bold">Nombre</label><input type="text" name="nombre" class="form-control custom-input" required></div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Disciplina</label>
                         <select name="disciplina" class="form-select custom-input" required>
-                            <option value="Futbol">Fútbol</option>
-                            <option value="Futbol Sala">Fútbol Sala</option>
-                            <option value="Voleibol">Voleibol</option>
-                            <option value="Tenis de Mesa">Tenis de Mesa</option>
-                            <option value="Baloncesto">Baloncesto</option>
+                            <option>Fútbol</option><option>Fútbol Sala</option><option>Voleibol</option><option>Tenis de Mesa</option><option>Baloncesto</option>
                         </select>
                     </div>
                     <div class="row">
@@ -161,12 +217,12 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark border-secondary text-white">
             <div class="modal-header border-0"><h5 class="modal-title fw-bold">Nuevo Entrenamiento</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
+            <div class="modal-body text-start">
                 <form>
                     <div class="mb-3">
                         <label class="small fw-bold">Deporte</label>
                         <select class="form-select custom-input">
-                            <option>Fútbol</option><option>Fútbol Sala</option><option>Voleibol</option><option>Tenis de Mesa</option><option>Baloncesto</option>
+                            <option>Fútbol</option><option>Voleibol</option><option>Baloncesto</option>
                         </select>
                     </div>
                     <div class="row">
@@ -180,26 +236,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalNovedad" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-0"><h5 class="modal-title fw-bold text-white">Publicar Aviso</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3"><label class="small fw-bold text-white-50">Título</label><input type="text" class="form-control custom-input" placeholder="Ej: Citación Seleccionados Fútbol"></div>
-                    <div class="mb-3"><label class="small fw-bold text-white-50">Contenido</label><textarea class="form-control custom-input" rows="3"></textarea></div>
-                    <button type="button" class="btn btn-light w-100 fw-bold">ENVIAR AVISO</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="modalInscribir" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-0"><h5 class="modal-title fw-bold text-white">Inscripción Intercentros</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
+        <div class="modal-content bg-dark border-secondary text-white">
+            <div class="modal-header border-0"><h5 class="modal-title fw-bold">Inscripción Intercentros</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-start">
                 <div class="p-2 mb-3 rounded bg-dark border border-secondary small text-white-50">
                     ID: {{ user.numero_documento }} | Ficha: {{ user.ficha }}
                 </div>
