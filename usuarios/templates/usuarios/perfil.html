@@ -1,216 +1,432 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Mi Perfil{% endblock %}
+{% block title %}Mi Perfil - Sistema Deportivo{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/inicio.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    /* 1. RESET GENERAL DE MAYÚSCULAS */
+    .main-container, .modal-content, .nav-tabs, .btn, .badge, .table th, .table td {
+        text-transform: none !important;
+    }
+
+    /* 2. CLASE MAESTRA PARA CAPITALIZE */
+    .text-cap {
+        text-transform: capitalize !important;
+    }
+
+    /* 3. ESTILOS DE LA FOTO Y CÁMARA */
+    .btn-camera {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: var(--accent-blue);
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid #050814;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    .btn-camera:hover {
+        background: var(--accent-hover);
+        transform: scale(1.1);
+    }
+
+    /* 4. NAVEGACIÓN POR TABS */
+    .nav-tabs .nav-link {
+        color: rgba(255,255,255,0.6);
+        border: none;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+        text-transform: capitalize !important;
+        font-weight: 500;
+        padding: 10px 20px;
+    }
+    .nav-tabs .nav-link.active {
+        background: transparent !important;
+        color: var(--accent-blue) !important;
+        border-bottom: 2px solid var(--accent-blue);
+    }
+
+    /* 5. DISEÑO DE NOVEDADES */
+    .news-item {
+        border-left: 3px solid var(--accent-blue);
+        background: rgba(255, 255, 255, 0.03);
+        transition: transform 0.2s;
+    }
+    .news-item:hover {
+        transform: translateX(5px);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* 6. INPUTS DESHABILITADOS */
+    .custom-input:disabled {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        opacity: 0.8;
+        color: #aaa !important;
+    }
+
+    /* 7. RESPONSIVE */
+    @media (max-width: 768px) {
+        .border-md-end {
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="main-container py-4">
-  <div class="container">
+    <div class="container">
 
-    <!-- Cabecera del perfil -->
-    <div class="sport-card mb-4 text-center">
-      <i class="fas fa-user-circle fa-4x text-warning mb-3"></i>
-      <h3 class="text-white fw-bold">{{ usuario.get_full_name }}</h3>
-      <p class="text-white-50 mb-1">
-        <i class="fas fa-id-card me-1"></i>{{ usuario.tipo_documento }} - {{ usuario.numero_documento }}
-      </p>
-      <p class="text-white-50 mb-1">
-        <i class="fas fa-envelope me-1"></i>{{ usuario.email }}
-      </p>
-      <p class="text-white-50 mb-3">
-        <i class="fas fa-calendar me-1"></i>Miembro desde {{ usuario.fecha_registro|date:"d/m/Y" }}
-      </p>
-      <span class="badge bg-warning text-dark px-3 py-2 fs-6">
-        <i class="fas fa-user-graduate me-1"></i>Aprendiz
-      </span>
-      <div class="mt-3">
-        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
-          <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
-        </a>
-      </div>
+        <!-- ==========================================
+             CABECERA DEL PERFIL: ESTRUCTURA 2 COLUMNAS
+             ========================================== -->
+        <div class="sport-card mb-4 shadow-lg">
+            <div class="row align-items-center p-2">
+                
+                <!-- COLUMNA IZQUIERDA: FOTO Y NOMBRE -->
+                <div class="col-md-4 text-center border-md-end" style="border-color: rgba(255,255,255,0.1) !important;">
+                    <div class="mb-3 position-relative d-inline-block">
+                        {% if usuario.foto_perfil %}
+                            <img src="{{ usuario.foto_perfil.url }}" alt="Perfil" class="rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--accent-blue);">
+                        {% else %}
+                            <i class="fas fa-user-circle fa-8x text-info mb-2" style="filter: drop-shadow(0 0 10px rgba(0,210,255,0.3));"></i>
+                        {% endif %}
+                    </div>
+                    <h2 class="text-white fw-bold text-cap mb-1">{{ usuario.get_full_name|lower }}</h2>
+                    <span class="badge bg-info text-dark px-3 py-1 mb-3 text-cap">
+                        <i class="fas fa-user-graduate me-1"></i>Aprendiz sena
+                    </span>
+                </div>
+
+                <!-- COLUMNA DERECHA: DATOS INSTITUCIONALES Y CONTACTO -->
+                <div class="col-md-8 ps-md-5">
+                    <div class="row g-4">
+                        <!-- Bloque 1: Formación e Identificación -->
+                        <div class="col-sm-6 text-start">
+                            <h6 class="text-info fw-bold small mb-3 text-cap"><i class="fas fa-university me-2"></i>Información académica</h6>
+                            <p class="text-white mb-2 text-cap">
+                                <span class="text-white-50">Programa:</span> {{ usuario.get_programa_formacion_display|default:usuario.programa_formacion|lower }}
+                            </p>
+                            <p class="text-white mb-2">
+                                <span class="text-white-50">Número de ficha:</span> <span class="text-info fw-bold">{{ usuario.ficha|default:"No registrada" }}</span>
+                            </p>
+                            <p class="text-white text-cap mb-1">
+                                <span class="text-white-50">Tipo de identificación:</span> {{ usuario.tipo_documento|lower }}
+                            </p>
+                            <p class="text-white text-cap">
+                                <span class="text-white-50">Número de identificación:</span> {{ usuario.numero_documento }}
+                            </p>
+                        </div>
+
+                        <!-- Bloque 2: Contacto -->
+                        <div class="col-sm-6 text-start">
+                            <h6 class="text-info fw-bold small mb-3 text-cap"><i class="fas fa-address-book me-2"></i>Contacto y cuenta</h6>
+                            <p class="text-white mb-2 text-truncate">
+                                <span class="text-white-50">Correo electrónico:</span> {{ usuario.email }}
+                            </p>
+                            <p class="text-white mb-2">
+                                <span class="text-white-50">Teléfono celular:</span> {{ usuario.telefono|default:"Sin registrar" }}
+                            </p>
+                            <p class="text-white text-cap">
+                                <span class="text-white-50">Miembro desde:</span> {{ usuario.fecha_registro|date:"j \d\e F, Y"|lower }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Gestión -->
+                    <div class="mt-4 d-flex justify-content-start gap-3">
+                        <button class="btn btn-warning btn-sm px-4 text-cap shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                            <i class="fas fa-user-edit me-2"></i>Editar perfil
+                        </button>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm px-4 text-cap">
+                            <i class="fas fa-power-off me-2"></i>Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SISTEMA DE TABS (CAPITALIZADOS)
+             ========================================== -->
+        <ul class="nav nav-tabs mb-4 justify-content-center border-0" id="perfilTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-novedades">
+                    Novedades
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-gimnasio">
+                    Gimnasio
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-prestamos">
+                    Préstamos
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-interfichas">
+                    Inter-fichas
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-intercentros">
+                    Inter-centros
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content pb-5">
+
+            <!-- 1. TAB NOVEDADES -->
+            <div class="tab-pane fade show active" id="tab-novedades">
+                <div class="sport-card text-start">
+                    <h5 class="fw-bold mb-4 text-info text-cap"><i class="fas fa-rss me-2"></i>Notificaciones del sistema</h5>
+                    <div class="news-item p-3 mb-3 rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary p-2 rounded-circle me-3"><i class="fas fa-info-circle text-white"></i></div>
+                                <div>
+                                    <h6 class="text-white mb-1 fw-bold text-cap">Bienvenido al sistema</h6>
+                                    <p class="text-white-50 small mb-0">Gestiona tus actividades deportivas, torneos e implementos desde un solo lugar.</p>
+                                </div>
+                            </div>
+                            <span class="badge bg-dark text-info text-cap">Reciente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. TAB GIMNASIO -->
+            <div class="tab-pane fade" id="tab-gimnasio">
+                <div class="sport-card text-start">
+                    <h5 class="fw-bold mb-4 text-info text-cap"><i class="fas fa-clock me-2"></i>Historial de ingresos al gimnasio</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr class="text-cap">
+                                    <th>Fecha</th>
+                                    <th>Hora entrada</th>
+                                    <th>Hora salida</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in reservas_gimnasio %}
+                                <tr>
+                                    <td>{{ r.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ r.hora_entrada }}</td>
+                                    <td>{{ r.hora_salida }}</td>
+                                    <td><span class="badge bg-success text-cap">Finalizado</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-white-50 text-cap">No tienes registros de ingreso.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. TAB PRÉSTAMOS -->
+            <div class="tab-pane fade" id="tab-prestamos">
+                <div class="sport-card text-start">
+                    <h5 class="fw-bold mb-4 text-info text-cap"><i class="fas fa-volleyball-ball me-2"></i>Mis préstamos de implementos</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr class="text-cap">
+                                    <th>Código</th>
+                                    <th>Implemento</th>
+                                    <th>Cant.</th>
+                                    <th>Fecha préstamo</th>
+                                    <th>Devolución</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in prestamos %}
+                                <tr>
+                                    <td class="text-info fw-bold">#{{ p.codigo_prestamo }}</td>
+                                    <td class="text-cap">{{ p.elemento.tipo_maquina|lower }}</td>
+                                    <td>{{ p.cantidad_prestada }}</td>
+                                    <td>{{ p.fecha_prestamo|date:"d/m/Y" }}</td>
+                                    <td class="text-warning fw-bold">{{ p.fecha_devolucion|date:"d/m/Y" }}</td>
+                                    <td><span class="badge bg-primary text-cap">{{ p.estado_prestamo|lower }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="6" class="text-center py-4 text-white-50 text-cap">No hay préstamos registrados.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. TAB INTER-FICHAS -->
+            <div class="tab-pane fade" id="tab-interfichas">
+                <div class="sport-card text-start">
+                    <h5 class="fw-bold mb-4 text-info text-cap"><i class="fas fa-users me-2"></i>Participación en torneos inter-fichas</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr class="text-cap">
+                                    <th>Equipo</th>
+                                    <th>Disciplina</th>
+                                    <th>Ficha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for e in equipos_interfichas %}
+                                <tr>
+                                    <td class="fw-bold text-cap">{{ e.nombre_equipo|lower }}</td>
+                                    <td class="text-cap">{{ e.disciplina|lower }}</td>
+                                    <td>{{ e.ficha }}</td>
+                                    <td><span class="badge bg-success text-cap">Inscrito</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-white-50 text-cap">No participas en torneos inter-fichas.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. TAB INTER-CENTROS -->
+            <div class="tab-pane fade" id="tab-intercentros">
+                <div class="sport-card text-start">
+                    <h5 class="fw-bold mb-4 text-info text-cap"><i class="fas fa-medal me-2"></i>Selecciones representativas inter-centros</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                                <tr class="text-cap">
+                                    <th>Selección</th>
+                                    <th>Centro</th>
+                                    <th>Disciplina</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for e in equipos_intercentros %}
+                                <tr>
+                                    <td class="fw-bold text-cap">{{ e.nombre_equipo|lower }}</td>
+                                    <td class="text-cap">{{ e.centro_formacion|lower }}</td>
+                                    <td class="text-cap">{{ e.disciplina|lower }}</td>
+                                    <td><span class="badge bg-primary text-cap">Seleccionado</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4 text-white-50 text-cap">Sin registros en inter-centros.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+</div>
 
-    <!-- Tabs de actividad -->
-    <ul class="nav nav-tabs nav-tabs-custom mb-4" id="perfilTabs">
-      <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-gimnasio">
-          <i class="fas fa-dumbbell me-1"></i>Gimnasio
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-prestamos">
-          <i class="fas fa-hand-holding me-1"></i>Préstamos
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-interfichas">
-          <i class="fas fa-trophy me-1"></i>Inter-Fichas
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-intercentros">
-          <i class="fas fa-building me-1"></i>Inter-Centros
-        </button>
-      </li>
-    </ul>
+<!-- ==========================================
+     MODAL: ACTUALIZAR PERFIL (DISEÑO LIMPIO)
+     ========================================== -->
+<div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-modal text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-cap"><i class="fas fa-user-cog me-2"></i>Actualizar mis datos</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form method="POST" action="{% url 'perfil' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="text-center mb-4 mt-2">
+                        <div class="position-relative d-inline-block">
+                            {% if usuario.foto_perfil %}
+                                <img id="imgPreviewPerfil" src="{{ usuario.foto_perfil.url }}" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover; border: 2px solid var(--accent-blue);">
+                            {% else %}
+                                <img id="imgPreviewPerfil" src="https://via.placeholder.com/120x120/050814/00d2ff?text=SENA" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 2px dashed var(--accent-blue);">
+                            {% endif %}
+                            <label for="inputFotoPerfil" class="btn-camera" title="Cambiar foto">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" name="imagen" id="inputFotoPerfil" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
+                        </div>
+                    </div>
 
-    <div class="tab-content">
+                    <div class="row g-3">
+                        <!-- Campos No Editables (Información de Identidad Separada) -->
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-white-50 text-cap">Nombre completo</label>
+                            <input type="text" class="custom-input form-control border-0 text-white text-cap" value="{{ usuario.get_full_name|lower }}" disabled>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-white-50 text-cap">Tipo de identificación</label>
+                            <input type="text" class="custom-input form-control border-0 text-white text-cap" value="{{ usuario.tipo_documento|lower }}" disabled>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-white-50 text-cap">Número de identificación</label>
+                            <input type="text" class="custom-input form-control border-0 text-white" value="{{ usuario.numero_documento }}" disabled>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-white-50 text-cap">Número de ficha</label>
+                            <input type="text" class="custom-input form-control border-0 text-white" value="{{ usuario.ficha|default:'N/A' }}" disabled>
+                        </div>
+                        
+                        <!-- Campos Editables -->
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-cap">Correo electrónico</label>
+                            <input type="email" name="email" class="custom-input form-control shadow-sm" value="{{ usuario.email }}" required>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <label class="form-label small fw-bold text-cap">Número de teléfono</label>
+                            <input type="text" name="celular" class="custom-input form-control shadow-sm" value="{{ usuario.telefono|default:'' }}" placeholder="Ej: 3001234567">
+                        </div>
+                    </div>
 
-      <!-- GIMNASIO -->
-      <div class="tab-pane fade show active" id="tab-gimnasio">
-        <div class="sport-card text-start">
-          <h5 class="fw-bold mb-3">
-            <i class="fas fa-dumbbell text-warning me-2"></i>Mis Sesiones en el Gimnasio
-          </h5>
-          <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Fecha Entrada</th>
-                  <th>Hora Entrada</th>
-                  <th>Fecha Salida</th>
-                  <th>Hora Salida</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for r in reservas %}
-                <tr>
-                  <td>{{ r.codigo_registro }}</td>
-                  <td>{{ r.fecha_entrada }}</td>
-                  <td>{{ r.hora_entrada }}</td>
-                  <td>{{ r.fecha_salida }}</td>
-                  <td>{{ r.hora_salida }}</td>
-                  <td><span class="badge bg-warning text-dark">{{ r.estado }}</span></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center text-white-50">Sin sesiones registradas.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+                    <div class="alert alert-info mt-4 p-2 small border-0 bg-dark text-white-50 text-cap text-center">
+                        <i class="fas fa-info-circle me-2 text-info"></i>Los datos de identidad y académicos son institucionales y no pueden ser editados.
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 btn-cap py-3 mt-2 shadow-lg">
+                        <i class="fas fa-save me-2"></i>Guardar cambios realizados
+                    </button>
+                </form>
+            </div>
         </div>
-      </div>
-
-      <!-- PRÉSTAMOS -->
-      <div class="tab-pane fade" id="tab-prestamos">
-        <div class="sport-card text-start">
-          <h5 class="fw-bold mb-3">
-            <i class="fas fa-hand-holding text-warning me-2"></i>Mis Préstamos de Elementos
-          </h5>
-          <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Elemento</th>
-                  <th>Cantidad</th>
-                  <th>Fecha Préstamo</th>
-                  <th>Fecha Devolución</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for p in prestamos %}
-                <tr>
-                  <td>{{ p.codigo_prestamo }}</td>
-                  <td>{{ p.elemento }}</td>
-                  <td>{{ p.cantidad_prestada }}</td>
-                  <td>{{ p.fecha_prestamo }}</td>
-                  <td>{{ p.fecha_devolucion }}</td>
-                  <td><span class="badge bg-info">{{ p.estado_prestamo }}</span></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center text-white-50">Sin préstamos registrados.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- INTER-FICHAS -->
-      <div class="tab-pane fade" id="tab-interfichas">
-        <div class="sport-card text-start">
-          <h5 class="fw-bold mb-3">
-            <i class="fas fa-trophy text-warning me-2"></i>Mis Equipos Inter-Fichas
-          </h5>
-          <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Equipo</th>
-                  <th>Ficha</th>
-                  <th>Disciplina</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for e in equipos_interfichas %}
-                <tr>
-                  <td>{{ e.codigo_equipo_interfichas }}</td>
-                  <td>{{ e.nombre_equipo }}</td>
-                  <td>{{ e.ficha }}</td>
-                  <td>{{ e.disciplina }}</td>
-                  <td><span class="badge bg-success">{{ e.estado }}</span></td>
-                  <td>{{ e.fecha_creacion }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center text-white-50">Sin participaciones en Inter-Fichas.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- INTER-CENTROS -->
-      <div class="tab-pane fade" id="tab-intercentros">
-        <div class="sport-card text-start">
-          <h5 class="fw-bold mb-3">
-            <i class="fas fa-building text-warning me-2"></i>Mis Equipos Inter-Centros
-          </h5>
-          <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Equipo</th>
-                  <th>Centro</th>
-                  <th>Disciplina</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for e in equipos_intercentros %}
-                <tr>
-                  <td>{{ e.codigo_equipo_centro }}</td>
-                  <td>{{ e.nombre_equipo }}</td>
-                  <td>{{ e.centro_formacion }}</td>
-                  <td>{{ e.disciplina }}</td>
-                  <td><span class="badge bg-primary">{{ e.estado }}</span></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center text-white-50">Sin participaciones en Inter-Centros.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/inicio.js' %}"></script>
+<script>
+    function previewProfileImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById('imgPreviewPerfil');
+            output.src = reader.result;
+            output.style.border = "2px solid var(--accent-hover)";
+        };
+        if(event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    }
+</script>
 {% endblock %}
