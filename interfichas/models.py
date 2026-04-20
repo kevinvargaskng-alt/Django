@@ -5,6 +5,8 @@ from django.conf import settings
 # Almacena los nombres: Fútbol, Baloncesto, etc.
 class Disciplina(models.Model):
     nombre_disciplina = models.CharField(max_length=50, unique=True)
+    icono             = models.CharField(max_length=60, default='fa-medal')
+    reglas            = models.TextField(blank=True, default='')
 
     def __str__(self):
         return self.nombre_disciplina
