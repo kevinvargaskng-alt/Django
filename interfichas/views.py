@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import TorneoInterfichas, EquipoInterfichas, Disciplina, JugadorEquipo
 from django.contrib.auth.decorators import login_required
 from .models import ResultadoTorneo
+from datetime import date
 
 @login_required
 def interfichas_list(request):
@@ -21,14 +22,66 @@ def interfichas_list(request):
         # --- NUEVO: LÓGICA PARA CREAR SOLO DISCIPLINA (Historia de Usuario) ---
         if accion == 'crear_disciplina_unica':
             nombre_disc = request.POST.get('nombre_disciplina', '').strip()
-            if nombre_disc:
-                obj, created = Disciplina.objects.get_or_create(nombre_disciplina=nombre_disc)
-                if created:
-                    messages.success(request, f"Disciplina '{nombre_disc}' creada exitosamente.")
-                else:
-                    messages.info(request, f"La disciplina '{nombre_disc}' ya existe en el sistema.")
-            return redirect('interfichas')
+            
+            # Validar que no esté vacío
+            if not nombre_disc:
+                messages.error(request, "El nombre de la disciplina no puede estar vacío.")
+                return redirect('interfichas')
+            
+            # Validar longitud
+            if len(nombre_disc) > 50:
+                messages.error(request, "El nombre de la disciplina no puede exceder 50 caracteres.")
+                return redirect('interfichas')
+            # Validar y sanitizar datos
+            nombre = request.POST.get('nombre', '').strip()
+            fecha_str = request.POST.get('fecha', '').strip()
+            lugar = request.POST.get('lugar', '').strip()
+            id_disciplina = request.POST.get('disciplina_id', '').strip()
+            
+            # Validar campos requeridos
+            if not nombre or not fecha_str or not lugar or not id_disciplina:
+                messages.error(request, "Por favor, completa todos los campos requeridos.")
+                return redirect('interfichas')
+            
+            # Validar longitud
+            if len(nombre) > 100 or len(lugar) > 100:
+                messages.error(request, "Nombre o lugar demasiado largo (máx. 100 caracteres).")
+                return redirect('interfichas')
+            # Validar y sanitizar datos
+            torneo_id = request.POST.get('torneo_id', '').strip()
+            nombre_equipo = request.POST.get('nombre_equipo', '').strip()
+            capitan = request.POST.get('capitan', '').strip()
+            ficha = request.POST.get('ficha', '').strip()
+            programa = request.POST.get('programa', '').strip()
+            
+            # Validar campos requeridos
+            if not torneo_id or not nombre_equipo or not capitan or not ficha or not programa:
+                messages.error(request, "Por favor, completa todos los campos requeridos.")
+                return redirect('interfichas')
+            
+            # Validar longitudes
+            if len(nombre_equipo) > 100 or len(capitan) > 100 or len(programa) > 150:
+                messages.error(request, "Algunos campos exceden la longitud máxima permitida.")
+                return redirect('interfichas')
+            
+            torneo_obj = get_object_or_404(TorneoInterfichas, pk=torneo_id)
+            
+            nuevo_equipo = EquipoInterfichas.objects.create(
+                torneo=torneo_obj,
+                nombre_equipo=nombre_equipo,
+                capitan=capitan,
+                ficha=int(ficha) if ficha.isdigit() else 0,
+                programa=programa,
+                disciplina=torneo_obj.disciplina,
+                usuario_registra=request.user
+            )
 
+            # Procesar lista de jugadores
+            jugadores_nombres = request.POST.getlist('jugadores[]')
+            for nombre in jugadores_nombres:
+                nombre_limpio = nombre.strip()
+                if nombre_limpio:
+                    JugadorEquipo.objects.create(nombre_completo=nombre_limpio
         # --- ACTUALIZADO: LÓGICA CREAR TORNEO (Seleccionando disciplina existente) ---
         elif accion == 'crear_torneo':
             id_disciplina = request.POST.get('disciplina_id')
