@@ -47,7 +47,7 @@ class Sugerencia(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     tipo = models.CharField(max_length=50, default='otro')
     comentario = models.TextField()
-    anonimo = models.BooleanField(default=False)
+    anonimo = models.BooleanField(default=False) 
     respuesta = models.TextField(null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
 

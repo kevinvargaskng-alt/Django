@@ -82,4 +82,4 @@ def enviar_sugerencia(request):
             anonimo=request.POST.get('anonimo') == '1'
         )
         messages.success(request, '¡Sugerencia enviada!')
-    return redirect('perfil')
+    return redirect('perfil')   
