@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ElementoDeportivo, Prestamo, Devolucion, Sancion, Revision
 from datetime import datetime, date, timedelta
+from usuarios.models import Usuario
 
 
 @login_required
@@ -10,7 +11,7 @@ def inventario_list(request):
     elementos = ElementoDeportivo.objects.all()
     # Solo muestra los préstamos del usuario logueado
     prestamos = Prestamo.objects.filter(usuario=request.user).order_by('-fecha_prestamo')
-    sanciones = Sancion.objects.filter(estado_sancion='Activa')
+    sanciones = Sancion.objects.filter(usuario=request.user, estado_sancion='Activa')
 
     if request.method == 'POST':
         accion = request.POST.get('accion')
@@ -146,6 +147,7 @@ def devoluciones_list(request):
             # Crear sanción automática si hay novedad grave
             if tiene_novedad and tipo_novedad in ['Daño', 'Pérdida']:
                 Sancion.objects.create(
+                    usuario              = prestamo.usuario,
                     tipo_sancion         = f"{tipo_novedad} de {elemento.tipo_maquina}",
                     fecha_inicio_sancion = date.today(),
                     fecha_fin_sancion    = date.today() + timedelta(days=30),
@@ -181,7 +183,12 @@ def devoluciones_list(request):
 @login_required
 def sanciones_list(request):
     """Lista todas las sanciones. Solo staff puede crear o cerrar manualmente."""
-    sanciones = Sancion.objects.all().order_by('-fecha_inicio_sancion')
+    if request.user.is_staff:
+        sanciones = Sancion.objects.all().order_by('-fecha_inicio_sancion')
+    else:
+        sanciones = Sancion.objects.filter(usuario=request.user).order_by('-fecha_inicio_sancion')
+        
+    usuarios = Usuario.objects.filter(is_active=True).order_by('first_name')
 
     if request.method == 'POST':
         accion = request.POST.get('accion')
@@ -192,6 +199,7 @@ def sanciones_list(request):
 
         if accion == 'crear_sancion':
             Sancion.objects.create(
+                usuario_id           = request.POST.get('usuario_id'),
                 tipo_sancion         = request.POST.get('tipo_sancion'),
                 fecha_inicio_sancion = request.POST.get('fecha_inicio_sancion'),
                 fecha_fin_sancion    = request.POST.get('fecha_fin_sancion'),
@@ -211,6 +219,7 @@ def sanciones_list(request):
 
     return render(request, 'inventario/sanciones.html', {
         'sanciones': sanciones,
+        'usuarios': usuarios,
     })
 
 

@@ -113,7 +113,8 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Tipo</th>
+                            {% if user.is_staff %}<th>Usuario</th>{% endif %}
+                            <th>Novedad / Tipo</th>
                             <th>Descripción</th>
                             <th>Inicio</th>
                             <th>Fin</th>
@@ -125,7 +126,18 @@
                         {% for s in sanciones %}
                         <tr>
                             <td data-label="#" class="fw-bold text-danger">{{ s.codigo_sancion }}</td>
-                            <td data-label="Tipo" class="fw-bold">{{ s.tipo_sancion }}</td>
+                            {% if user.is_staff %}
+                            <td data-label="Usuario">
+                                <span class="fw-bold text-white">
+                                    {% if s.usuario %}
+                                        {{ s.usuario.get_full_name|default:s.usuario.username }}
+                                    {% else %}
+                                        Sin usuario
+                                    {% endif %}
+                                </span>
+                            </td>
+                            {% endif %}
+                            <td data-label="Novedad / Tipo" class="fw-bold">{{ s.tipo_sancion }}</td>
                             <td data-label="Descripción" class="text-white-50 small">
                                 {{ s.descripcion_sancion|truncatechars:80 }}
                             </td>
@@ -161,14 +173,14 @@
                         </tr>
                         {% if s.descripcion_sancion and s.descripcion_sancion|length > 80 %}
                         <tr style="background: #0d1117;">
-                            <td colspan="{% if user.is_staff %}7{% else %}6{% endif %}" class="text-white-50 small py-2 px-4">
+                            <td colspan="{% if user.is_staff %}8{% else %}6{% endif %}" class="text-white-50 small py-2 px-4">
                                 <i class="fas fa-comment-dots text-info me-2"></i>{{ s.descripcion_sancion }}
                             </td>
                         </tr>
                         {% endif %}
                         {% empty %}
                         <tr>
-                            <td colspan="{% if user.is_staff %}7{% else %}6{% endif %}"
+                            <td colspan="{% if user.is_staff %}8{% else %}6{% endif %}"
                                 class="text-center py-5 text-white-50">
                                 <i class="fas fa-shield-alt fa-2x mb-3 d-block text-success"></i>
                                 No hay sanciones registradas.
@@ -200,6 +212,16 @@
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="accion" value="crear_sancion">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Usuario a Sancionar</label>
+                        <select name="usuario_id" class="form-select custom-input" required>
+                            <option value="" disabled selected>-- Seleccione un usuario --</option>
+                            {% for u in usuarios %}
+                            <option value="{{ u.id }}">{{ u.get_full_name }} ({{ u.numero_documento }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold small">Tipo de Sanción</label>
