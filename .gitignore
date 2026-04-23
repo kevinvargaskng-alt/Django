@@ -29,3 +29,4 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+core/__pycache__/__init__.cpython-313.pyc
