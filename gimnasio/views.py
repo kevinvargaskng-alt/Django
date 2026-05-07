@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import GimnasioConfig, FechaIngreso
+from django.db.models import Q 
 
 @login_required
 def gimnasio_list(request):
@@ -40,10 +41,19 @@ def gimnasio_list(request):
         "08-17", "10-12", "11-02", "11-16", "12-08", "12-25"
     ]
     es_festivo = ahora.strftime("%m-%d") in festivos_2026
+    
+    config = GimnasioConfig.get_config()
 
-    # El sistema solo permite ingreso si cumple todas las condiciones
-    esta_abierto = horario_ok and not es_fin_de_semana and not es_festivo
+    # Verifica estado manual del admin
+    estado_manual = config.estado == 'abierta'
 
+# El sistema solo permite ingreso si cumple todo
+    esta_abierto = (
+    horario_ok
+    and not es_fin_de_semana
+    and not es_festivo
+    and estado_manual
+)
     # 3. PROCESAR REGISTRO DE ENTRADA (POST)
     if request.method == 'POST':
         accion = request.POST.get('accion')
@@ -65,7 +75,7 @@ def gimnasio_list(request):
                     fecha_permanencia=ahora.date(),
                     hora_salida=ahora.time(),
                     fecha_salida=ahora.date(),
-                    estado='Activo'
+                    estado='Activa'
                 )
                 messages.success(request, f"¡Entrada registrada! Bienvenido(a), {request.user.first_name}.")
             except Exception as e:
@@ -75,12 +85,17 @@ def gimnasio_list(request):
 
     # 4. RENDERIZADO
     return render(request, 'gimnasio/gimnasio.html', {
-        'reservas': mis_reservas,
-        'esta_abierto': esta_abierto,
-        'ahora': ahora,
-        'es_fin_de_semana': es_fin_de_semana,
-        'es_festivo': es_festivo
-    })
+    'reservas': mis_reservas,
+    'esta_abierto': esta_abierto,
+    'ahora': ahora,
+    'es_fin_de_semana': es_fin_de_semana,
+    'es_festivo': es_festivo,
+    'config': config,
+    'admin_reservas': Reserva.objects.all().order_by(
+        '-fecha_entrada',
+        '-hora_entrada'
+    )
+})
 
 # --- ELIMINAR REGISTRO ---
 @login_required
@@ -229,3 +244,71 @@ def admin_nuevo_registro(request):
     return render(request, 'gimnasio/admin_nuevo_registro.html', {
         'seccion_activa': 'nuevo_registro',
     })
+
+# ── VER TODAS LAS RESERVAS ──────────────────────────
+@login_required
+@user_passes_test(es_admin)
+def admin_reservas(request):
+
+    reservas = Reserva.objects.all().order_by(
+        '-fecha_entrada',
+        '-hora_entrada'
+    )
+
+    return render(request, 'gimnasio/gimnasio.html', {
+        'admin_reservas': reservas,
+        'seccion_activa': 'reservas',
+        'config': GimnasioConfig.get_config(),
+    })
+
+
+# ── CANCELAR RESERVA ──────────────────────────
+@login_required
+@user_passes_test(es_admin)
+def cancelar_reserva_admin(request, id):
+
+    reserva = get_object_or_404(
+        Reserva,
+        codigo_registro=id
+    )
+
+    reserva.estado = 'Cancelada'
+    reserva.save()
+
+    messages.warning(
+        request,
+        'La reservación fue cancelada correctamente.'
+    )
+
+    return redirect('admin_reservas')
+
+
+# ── CERRAR / ABRIR GIMNASIO ──────────────────────────
+@login_required
+@user_passes_test(es_admin)
+def cerrar_gimnasio(request):
+
+    config = GimnasioConfig.get_config()
+
+    if request.method == 'POST':
+
+        accion = request.POST.get('accion')
+
+        if accion == 'cerrar':
+            config.estado = 'cerrada'
+            messages.error(
+                request,
+                'El gimnasio fue cerrado.'
+            )
+
+        elif accion == 'abrir':
+            config.estado = 'abierta'
+            messages.success(
+                request,
+                'El gimnasio fue abierto.'
+            )
+
+        config.actualizado_por = request.user
+        config.save()
+
+    return redirect('gimnasio')
