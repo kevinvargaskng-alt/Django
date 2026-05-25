@@ -103,7 +103,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content custom-modal">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-white">
+                <h5 class="modal-title fw-bolder text-white fs-4" style="letter-spacing: -0.5px;">
                     <i class="fas fa-shield-alt me-2 text-primary"></i>Gestión de Acceso
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -176,159 +176,194 @@
 
                     <!-- PANEL REGISTRO -->
                     <div class="tab-pane fade" id="registerPanel" role="tabpanel">
-                        <form id="registerForm" novalidate>
+                        <form id="registerForm" novalidate class="px-2 py-3">
                             {% csrf_token %}
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <!-- Tipo Documento -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Tipo Documento <span class="text-danger">*</span></label>
-                                    <select class="form-select custom-input" name="tipo_documento" required autocomplet="off">
-                                        <option value="" selected disabled>-- Selecciona --</option>
-                                        <option value="CC">Cédula de Ciudadanía</option>
-                                        <option value="TI">Tarjeta de Identidad</option>
-                                        <option value="CE">Cédula de Extranjería</option>
-                                        <option value="PA">Pasaporte</option>
-                                    </select>
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Tipo Documento <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-id-card-alt text-white-50"></i></span>
+                                        <select class="form-select custom-input border-start-0 ps-0" name="tipo_documento" required autocomplete="off" style="box-shadow: none;">
+                                            <option value="" selected disabled>-- Selecciona --</option>
+                                            <option value="CC">Cédula de Ciudadanía</option>
+                                            <option value="TI">Tarjeta de Identidad</option>
+                                            <option value="CE">Cédula de Extranjería</option>
+                                            <option value="PA">Pasaporte</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 
                                 <!-- Número Documento -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Número Documento <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control custom-input" 
-                                           name="numero_documento" 
-                                           required 
-                                           pattern="\d{5,20}" 
-                                           maxlength="20" 
-                                           title="Debe contener entre 5 y 20 números sin espacios"
-                                           autocomplete="username"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Número Documento <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-hashtag text-white-50"></i></span>
+                                        <input type="text" 
+                                               class="form-control custom-input border-start-0 ps-0" 
+                                               name="numero_documento" 
+                                               required 
+                                               pattern="\d{5,20}" 
+                                               maxlength="20" 
+                                               title="Debe contener entre 5 y 20 números sin espacios"
+                                               autocomplete="username"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                 </div>
                                 
                                 <!-- Nombres -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Nombres <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control custom-input text-capitalize" 
-                                           name="nombres" 
-                                           required 
-                                           minlength="2" 
-                                           maxlength="100" 
-                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
-                                           title="Solo se permiten letras y espacios"
-                                           autocomplete="given-name"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Nombres <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-user text-white-50"></i></span>
+                                        <input type="text" 
+                                               class="form-control custom-input border-start-0 ps-0 text-capitalize" 
+                                               name="nombres" 
+                                               required 
+                                               minlength="2" 
+                                               maxlength="100" 
+                                               pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                                               title="Solo se permiten letras y espacios"
+                                               autocomplete="given-name"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                 </div>
                                 
                                 <!-- Apellidos -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Apellidos <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control custom-input text-capitalize" 
-                                           name="apellidos" 
-                                           required 
-                                           minlength="2" 
-                                           maxlength="100" 
-                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
-                                           title="Solo se permiten letras y espacios"
-                                           autocomplete="family-name"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Apellidos <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-user text-white-50"></i></span>
+                                        <input type="text" 
+                                               class="form-control custom-input border-start-0 ps-0 text-capitalize" 
+                                               name="apellidos" 
+                                               required 
+                                               minlength="2" 
+                                               maxlength="100" 
+                                               pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                                               title="Solo se permiten letras y espacios"
+                                               autocomplete="family-name"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                 </div>
 
                                 <!-- Género -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Género <span class="text-danger">*</span></label>
-                                    <select class="form-select custom-input" name="genero" required autocomplete="off" title="Selecciona tu género" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                                        <option value="" selected>-- Seleccionar --</option>
-                                        <option value="M">Masculino</option>
-                                        <option value="F">Femenino</option>
-                                        <option value="O">Otro</option>
-                                        <option value="NR">Prefiero no decirlo</option>
-                                    </select>
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Género <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-venus-mars text-white-50"></i></span>
+                                        <select class="form-select custom-input border-start-0 ps-0" name="genero" required autocomplete="off" title="Selecciona tu género" data-bs-toggle="tooltip" data-bs-placement="bottom" style="box-shadow: none;">
+                                            <option value="" selected>-- Seleccionar --</option>
+                                            <option value="M">Masculino</option>
+                                            <option value="F">Femenino</option>
+                                            <option value="O">Otro</option>
+                                            <option value="NR">Prefiero no decirlo</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <!-- Teléfono -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Teléfono <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control custom-input" 
-                                           name="telefono" 
-                                           required 
-                                           pattern="\d{7,15}" 
-                                           maxlength="15" 
-                                           title="Ingresa un número de teléfono válido (mínimo 7 dígitos)"
-                                           autocomplete="tel"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Teléfono <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-phone text-white-50"></i></span>
+                                        <input type="text" 
+                                               class="form-control custom-input border-start-0 ps-0" 
+                                               name="telefono" 
+                                               required 
+                                               pattern="\d{7,15}" 
+                                               maxlength="15" 
+                                               title="Ingresa un número de teléfono válido (mínimo 7 dígitos)"
+                                               autocomplete="tel"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                 </div>
 
                                 <!-- Programa de Formación -->
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold text-white">Programa de Formación <span class="text-danger">*</span></label>
-                                    <select class="form-select custom-input" name="programa_formacion" required autocomplete="off">
-                                        <option value="" selected disabled>-- Selecciona tu programa --</option>
-                                        <option value="ADSO">Análisis y Desarrollo de Software (ADSO)</option>
-                                        <option value="MINERIA">Supervisión de Procesos Mineros</option>
-                                        <option value="SST">Gestión de la Seguridad y Salud en el Trabajo</option>
-                                        <option value="QUIMICA">Química Aplicada a la Industria</option>
-                                        <option value="TOPOGRAFIA">Levantamientos Topográficos y Georreferenciación</option>
-                                        <option value="VIAL">Construcción de Infraestructura Vial</option>
-                                        <option value="SANEAMIENTO">Sistemas de Agua y Saneamiento</option>
-                                        <option value="MAQUINARIA_PESADA">Operación de Maquinaria Pesada para Excavación</option>
-                                        <option value="MANTENIMIENTO_EQUIPO">Mantenimiento de Equipo Pesado para Infraestructura, Minería y Transporte</option>
-                                    </select>
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Programa de Formación <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-graduation-cap text-white-50"></i></span>
+                                        <select class="form-select custom-input border-start-0 ps-0" name="programa_formacion" required autocomplete="off" style="box-shadow: none;">
+                                            <option value="" selected disabled>-- Selecciona tu programa --</option>
+                                            <option value="ADSO">Análisis y Desarrollo de Software (ADSO)</option>
+                                            <option value="MINERIA">Supervisión de Procesos Mineros</option>
+                                            <option value="SST">Gestión de la Seguridad y Salud en el Trabajo</option>
+                                            <option value="QUIMICA">Química Aplicada a la Industria</option>
+                                            <option value="TOPOGRAFIA">Levantamientos Topográficos y Georreferenciación</option>
+                                            <option value="VIAL">Construcción de Infraestructura Vial</option>
+                                            <option value="SANEAMIENTO">Sistemas de Agua y Saneamiento</option>
+                                            <option value="MAQUINARIA_PESADA">Operación de Maquinaria Pesada para Excavación</option>
+                                            <option value="MANTENIMIENTO_EQUIPO">Mantenimiento de Equipo Pesado para Infraestructura, Minería y Transporte</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 
                                 <!-- Email -->
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold text-white">Correo Electrónico <span class="text-danger">*</span></label>
-                                    <input type="email" 
-                                           class="form-control custom-input" 
-                                           name="email" 
-                                           required 
-                                           title="Ingresa un correo electrónico válido (ej: nombre@correo.com)"
-                                           autocomplete="email"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Correo Electrónico <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-envelope text-white-50"></i></span>
+                                        <input type="email" 
+                                               class="form-control custom-input border-start-0 ps-0" 
+                                               name="email" 
+                                               required 
+                                               title="Ingresa un correo electrónico válido (ej: nombre@correo.com)"
+                                               autocomplete="email"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                     <div class="invalid-feedback">Por favor ingresa un correo válido.</div>
                                 </div>
                                 
                                 <!-- Ficha -->
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold text-white">Número de Ficha <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control custom-input" 
-                                           name="ficha" 
-                                           id="id_ficha" 
-                                           required 
-                                           pattern="\d{5,20}" 
-                                           maxlength="20" 
-                                           title="Ingresa el número de tu ficha de formación"
-                                           autocomplete="off"
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="bottom">
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Número de Ficha <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-users text-white-50"></i></span>
+                                        <input type="text" 
+                                               class="form-control custom-input border-start-0 ps-0" 
+                                               name="ficha" 
+                                               id="id_ficha" 
+                                               required 
+                                               pattern="\d{5,20}" 
+                                               maxlength="20" 
+                                               title="Ingresa el número de tu ficha de formación"
+                                               autocomplete="off"
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="bottom"
+                                               style="box-shadow: none;">
+                                    </div>
                                 </div>
 
                                 <!-- Contraseña -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Contraseña <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Contraseña <span class="text-danger">*</span></label>
                                     <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-lock text-white-50"></i></span>
                                         <input type="password" 
                                                name="contrasena" 
                                                id="id_contrasena" 
-                                               class="form-control custom-input" 
+                                               class="form-control custom-input border-start-0 ps-0 border-end-0" 
                                                required 
                                                minlength="8" 
                                                maxlength="128" 
                                                title="La contraseña debe tener al menos 8 caracteres"
                                                autocomplete="new-password"
                                                data-bs-toggle="tooltip" 
-                                               data-bs-placement="top">
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword2" title="Mostrar/Ocultar contraseña" data-bs-toggle="tooltip" data-bs-placement="top">
-                                            <i class="fas fa-eye"></i>
+                                               data-bs-placement="top"
+                                               style="box-shadow: none;">
+                                        <button class="btn btn-outline-secondary custom-input border-start-0" style="border-left: none;" type="button" id="togglePassword2" title="Mostrar/Ocultar contraseña" data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <i class="fas fa-eye text-white-50"></i>
                                         </button>
                                     </div>
                                     <div class="progress mt-2" style="height:6px;">
@@ -339,23 +374,25 @@
                                 
                                 <!-- Confirmar Contraseña -->
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-white">Confirmar Clave <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold text-white small text-uppercase" style="letter-spacing: 0.5px;">Confirmar Clave <span class="text-danger">*</span></label>
                                     <div class="input-group">
+                                        <span class="input-group-text bg-transparent border-end-0 custom-input" style="border-right: none;"><i class="fas fa-check-circle text-white-50"></i></span>
                                         <input type="password" 
                                                id="confirmarContrasena" 
-                                               class="form-control custom-input" 
+                                               class="form-control custom-input border-start-0 ps-0 border-end-0" 
                                                required 
                                                minlength="8" 
                                                maxlength="128"
-                                               autocomplete="new-password">
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword3" title="Mostrar/Ocultar contraseña" data-bs-toggle="tooltip" data-bs-placement="top">
-                                            <i class="fas fa-eye"></i>
+                                               autocomplete="new-password"
+                                               style="box-shadow: none;">
+                                        <button class="btn btn-outline-secondary custom-input border-start-0" style="border-left: none;" type="button" id="togglePassword3" title="Mostrar/Ocultar contraseña" data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <i class="fas fa-eye text-white-50"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div id="registerAlert" class="alert d-none mt-3" role="alert"></div>
-                            <button type="submit" class="btn btn-success w-100 py-2 mt-4 fw-bold">FINALIZAR REGISTRO</button>
+                            <div id="registerAlert" class="alert d-none mt-4" role="alert"></div>
+                            <button type="submit" class="btn btn-success w-100 py-3 mt-4 fw-bold text-uppercase" style="letter-spacing: 1px; border-radius: 12px;">Finalizar Registro</button>
                         </form>
                     </div>
                 </div>
