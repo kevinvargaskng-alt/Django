@@ -28,6 +28,30 @@
         background: var(--accent-hover);
         transform: scale(1.1);
     }
+    .btn-delete-photo {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid #050814;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 11;
+        box-shadow: 0 4px 12px rgba(255, 8, 68, 0.3);
+    }
+    .btn-delete-photo:hover {
+        background: linear-gradient(135deg, #ff0000, #ff4d4d);
+        transform: scale(1.2) rotate(15deg);
+        box-shadow: 0 6px 18px rgba(255, 0, 0, 0.5);
+        border-color: #fff;
+    }
 
     /* 4. NAVEGACIÓN POR TABS */
     .nav-tabs .nav-link {
@@ -151,11 +175,15 @@
                 <div class="col-md-4 text-center border-md-end" style="border-color: rgba(255,255,255,0.1) !important;">
                     <div class="mb-3 position-relative d-inline-block">
                         {% if usuario.foto_perfil %}
-                            <img src="{{ usuario.foto_perfil.url }}" alt="Perfil" class="rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--accent-blue);">
-                        {% else %}
-                            <div class="rounded-circle shadow initial-avatar mx-auto">
-                                {{ usuario.first_name|first|upper }}
+                            <img id="mainProfileImg" src="{{ usuario.foto_perfil.url }}" alt="Perfil" class="rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--accent-blue);">
+                            <div id="mainProfileInitials" class="rounded-circle shadow initial-avatar mx-auto d-none">
+                                {{ usuario.first_name|first|upper }}{{ usuario.last_name|first|upper }}
                             </div>
+                        {% else %}
+                            <div id="mainProfileInitials" class="rounded-circle shadow initial-avatar mx-auto">
+                                {{ usuario.first_name|first|upper }}{{ usuario.last_name|first|upper }}
+                            </div>
+                            <img id="mainProfileImg" src="" alt="Perfil" class="rounded-circle shadow d-none" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--accent-blue);">
                         {% endif %}
                     </div>
                     <h2 class="text-white fw-bold text-cap mb-1">{{ usuario.get_full_name|lower }}</h2>
@@ -294,7 +322,7 @@
                             <tbody>
                                 {% for r in reservas_gimnasio %}
                                 <tr>
-                                    <td>{{ r.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ r.fecha_entrada|date:"d/m/Y" }}</td>
                                     <td>{{ r.hora_entrada }}</td>
                                     <td>{{ r.hora_salida }}</td>
                                     <td><span class="badge bg-success text-cap">Finalizado</span></td>
@@ -518,16 +546,23 @@
                         <div class="position-relative d-inline-block">
                             {% if usuario.foto_perfil %}
                                 <img id="imgPreviewPerfil" src="{{ usuario.foto_perfil.url }}" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover; border: 2px solid var(--accent-blue);">
+                                <div id="initialPreview" class="rounded-circle shadow initial-avatar initial-avatar-sm mx-auto d-none">
+                                    {{ usuario.first_name|first|upper }}{{ usuario.last_name|first|upper }}
+                                </div>
                             {% else %}
                                 <div id="initialPreview" class="rounded-circle shadow initial-avatar initial-avatar-sm mx-auto">
-                                    {{ usuario.first_name|first|upper }}
+                                    {{ usuario.first_name|first|upper }}{{ usuario.last_name|first|upper }}
                                 </div>
                                 <img id="imgPreviewPerfil" src="" class="rounded-circle shadow d-none" style="width: 120px; height: 120px; object-fit: cover; border: 2px solid var(--accent-blue);">
                             {% endif %}
+                            <div id="btnEliminarFoto" class="btn-delete-photo {% if not usuario.foto_perfil %}d-none{% endif %}" title="Eliminar foto actual" onclick="removeProfileImage()">
+                                <i class="fas fa-trash"></i>
+                            </div>
                             <label for="inputFotoPerfil" class="btn-camera" title="Cambiar foto">
                                 <i class="fas fa-camera"></i>
                             </label>
                             <input type="file" name="imagen" id="inputFotoPerfil" class="d-none" accept="image/*" onchange="previewProfileImage(event)">
+                            <input type="hidden" name="borrar_imagen" id="inputBorrarImagen" value="0">
                         </div>
                     </div>
 
@@ -815,6 +850,34 @@
     </div>
 </div>
 
+<!-- MODAL ESTÉTICO DE CONFIRMACIÓN PARA ELIMINAR FOTO -->
+<div class="modal fade" id="modalConfirmarEliminarFoto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-white" style="background: linear-gradient(145deg, #0f172a, #1e2937); border: 1px solid var(--accent-blue); border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 210, 255, 0.2);">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 p-4 mb-3" style="border: 2px solid var(--accent-blue);">
+                        <i class="fas fa-image-slash fa-4x text-info"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold mb-2">¿Eliminar foto de perfil?</h3>
+                <p class="text-white-50 px-4">Esta acción quitará tu imagen actual. Podrás subir una nueva cuando quieras o dejar las iniciales de tu nombre.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-5">
+                <button type="button" class="btn btn-outline-light px-4 rounded-pill fw-bold" data-bs-dismiss="modal">
+                    Mantener foto
+                </button>
+                <button type="button" class="btn btn-info px-4 fw-bold rounded-pill shadow-lg text-dark" onclick="executeDeletePhoto()">
+                    <i class="fas fa-trash-alt me-2"></i>Confirmar eliminación
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- FORMULARIO OCULTO PARA BORRAR -->
 <form id="formBorrarReporte" method="POST" action="{% url 'perfil' %}" style="display:none;">
     {% csrf_token %}
@@ -859,14 +922,62 @@
 {% block extra_js %}
 <script src="{% static 'js/inicio.js' %}"></script>
 <script>
+    function removeProfileImage() {
+        const modalEl = document.getElementById('modalConfirmarEliminarFoto');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+
+    function executeDeletePhoto() {
+        // Elementos del Modal de Edición
+        const imgPreview = document.getElementById('imgPreviewPerfil');
+        const initialPreview = document.getElementById('initialPreview');
+        const btnEliminar = document.getElementById('btnEliminarFoto');
+        const inputBorrar = document.getElementById('inputBorrarImagen');
+        const inputFile = document.getElementById('inputFotoPerfil');
+
+        // Elementos de la Tarjeta Principal (Fondo)
+        const mainImg = document.getElementById('mainProfileImg');
+        const mainInitials = document.getElementById('mainProfileInitials');
+
+        // 1. Actualizar Vista del Modal
+        imgPreview.classList.add('d-none');
+        initialPreview.classList.remove('d-none');
+        btnEliminar.classList.add('d-none');
+        
+        // 2. Actualizar Vista de la Tarjeta Principal
+        if (mainImg) mainImg.classList.add('d-none');
+        if (mainInitials) mainInitials.classList.remove('d-none');
+
+        // 3. Marcar para eliminación en el servidor
+        inputBorrar.value = "1";
+        inputFile.value = ""; 
+        
+        // 4. Cerrar el modal de confirmación de forma segura
+        const modalEl = document.getElementById('modalConfirmarEliminarFoto');
+        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+    }
+
     function previewProfileImage(event) {
         var reader = new FileReader();
         reader.onload = function() {
             var output = document.getElementById('imgPreviewPerfil');
             var initial = document.getElementById('initialPreview');
+            var btnEliminar = document.getElementById('btnEliminarFoto');
+            var inputBorrar = document.getElementById('inputBorrarImagen');
+            
+            const mainImg = document.getElementById('mainProfileImg');
+            const mainInitials = document.getElementById('mainProfileInitials');
+
             output.src = reader.result;
             output.classList.remove('d-none');
+            btnEliminar.classList.remove('d-none');
+            inputBorrar.value = "0";
             if (initial) initial.classList.add('d-none');
+
+            // También actualizamos la tarjeta principal para que se vea el cambio
+            if (mainImg) { mainImg.src = reader.result; mainImg.classList.remove('d-none'); }
+            if (mainInitials) mainInitials.classList.add('d-none');
         };
         if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
     }
