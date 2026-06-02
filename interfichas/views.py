@@ -12,6 +12,14 @@ from .models import (
 )
 
 
+PAISES_TORNEO = [
+    "Argentina", "Brasil", "Francia", "España", "Inglaterra",
+    "Alemania", "Portugal", "Países Bajos", "Colombia", "Uruguay",
+    "Croacia", "Bélgica", "Marruecos", "Japón", "Estados Unidos",
+    "México"
+]
+
+
 def es_admin(user):
     return user.is_authenticated and user.is_staff
 
@@ -148,9 +156,19 @@ def interfichas_list(request):
                 )
                 return redirect('interfichas')
 
+            # --- ASIGNACIÓN AUTOMÁTICA DE PAÍS EN ORDEN ---
+            nombres_existentes = set(torneo_obj.equipos.values_list('nombre_equipo', flat=True))
+            nombre_equipo = ""
+            for pais in PAISES_TORNEO:
+                if pais not in nombres_existentes:
+                    nombre_equipo = pais
+                    break
+            if not nombre_equipo:
+                nombre_equipo = f"Equipo {torneo_obj.equipos.count() + 1}"
+
             nuevo_equipo = EquipoInterfichas.objects.create(
                 torneo=torneo_obj,
-                nombre_equipo=request.POST.get('nombre_equipo', '').strip(),
+                nombre_equipo=nombre_equipo,
                 capitan=request.POST.get('capitan', '').strip(),
                 ficha=ficha,
                 programa=request.POST.get('programa', '').strip(),
@@ -380,6 +398,19 @@ def registrar_resultado(request, partido_id):
                 messages.error(request, "Resultado inválido.")
                 return redirect('gestionar_torneo', torneo_id=torneo_id)
 
+    # Guardar tarjetas y sanciones disciplinarias si es marcador tipo goles
+    if partido.tipo_marcador == 'goles':
+        try:
+            partido.tarjetas_amarillas_local = int(request.POST.get('amarillas_local', 0) or 0)
+            partido.tarjetas_amarillas_visitante = int(request.POST.get('amarillas_visitante', 0) or 0)
+            partido.tarjetas_rojas_local = int(request.POST.get('rojas_local', 0) or 0)
+            partido.tarjetas_rojas_visitante = int(request.POST.get('rojas_visitante', 0) or 0)
+            partido.tarjetas_azules_local = int(request.POST.get('azules_local', 0) or 0)
+            partido.tarjetas_azules_visitante = int(request.POST.get('azules_visitante', 0) or 0)
+        except ValueError:
+            pass
+        partido.detalles_sanciones = request.POST.get('detalles_sanciones', '').strip()
+
     partido.save()
     messages.success(request, "Resultado guardado correctamente.")
     return redirect('gestionar_torneo', torneo_id=torneo_id)
@@ -531,3 +562,50 @@ def reporte_torneo(request, torneo_id):
         'partidos_semifinal': torneo.partidos.filter(fase='semifinal').select_related('equipo_local', 'equipo_visitante'),
         'partidos_final':     torneo.partidos.filter(fase='final').select_related('equipo_local', 'equipo_visitante'),
     })
+
+
+@solo_admin
+def editar_equipo(request, equipo_id):
+    equipo = get_object_or_404(EquipoInterfichas, pk=equipo_id)
+    if request.method == 'POST':
+        equipo.nombre_equipo = request.POST.get('nombre_equipo', equipo.nombre_equipo).strip()
+        equipo.capitan = request.POST.get('capitan', equipo.capitan).strip()
+        equipo.ficha = request.POST.get('ficha', equipo.ficha)
+        equipo.programa = request.POST.get('programa', equipo.programa).strip()
+        equipo.save()
+        messages.success(request, f"Equipo '{equipo.nombre_equipo}' actualizado correctamente.")
+        return redirect('gestionar_torneo', torneo_id=equipo.torneo.pk)
+    
+    return JsonResponse({
+        'id': equipo.pk,
+        'nombre_equipo': equipo.nombre_equipo,
+        'capitan': equipo.capitan,
+        'ficha': equipo.ficha,
+        'programa': equipo.programa,
+    })
+
+
+@solo_admin
+@require_POST
+def eliminar_equipo(request, equipo_id):
+    equipo = get_object_or_404(EquipoInterfichas, pk=equipo_id)
+    torneo_id = equipo.torneo.pk
+    nombre = equipo.nombre_equipo
+    equipo.delete()
+    messages.warning(request, f"Equipo '{nombre}' eliminado del torneo.")
+    return redirect('gestionar_torneo', torneo_id=torneo_id)
+
+
+@solo_admin
+@require_POST
+def asignar_paises_torneo(request, torneo_id):
+    torneo = get_object_or_404(TorneoInterfichas, pk=torneo_id)
+    equipos = list(torneo.equipos.all().order_by('fecha_inscripcion', 'codigo_equipo_interfichas'))
+    for i, eq in enumerate(equipos):
+        if i < len(PAISES_TORNEO):
+            eq.nombre_equipo = PAISES_TORNEO[i]
+        else:
+            eq.nombre_equipo = f"Equipo {i + 1}"
+        eq.save()
+    messages.success(request, "Nombres de países generados y asignados a los equipos en orden.")
+    return redirect('gestionar_torneo', torneo_id=torneo_id)
